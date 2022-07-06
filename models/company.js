@@ -65,8 +65,14 @@ class Company {
            ORDER BY name`);
     return companiesRes.rows;
   }
-
+  /** Find all companies, after filter via query params.
+   * 
+   *  Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   */
   //TODO: Add findAllFiltered()
+  static async findAllFiltered() {
+    const companiesRes = await
+  }
 
   /** Given a company handle, return data about company.
    *

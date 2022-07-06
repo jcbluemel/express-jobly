@@ -51,7 +51,17 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-
+  if(req.query){
+    const validator = jsonschema.validate(
+      req.query,
+      companyFilter,
+      {required: true}
+    );
+    if (!validator.valid) {
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
+  }
   //TODO: if req.query params:
   //  validate the params
   //    get companies from Company.findAllFiltered()

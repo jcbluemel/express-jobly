@@ -1,6 +1,8 @@
 "use strict";
 
-const { sqlForPartialUpdate } = require("./sql");
+const {
+  sqlForPartialUpdate,
+  sqlForCompaniesFindAllFiltered } = require("./sql");
 const { BadRequestError } = require("../expressError");
 
 
@@ -37,4 +39,32 @@ describe("sqlForPartialUpdate", function () {
   //     expect(err instanceof BadRequestError).toBeTruthy();
   //   }
   // });
+});
+
+describe("sqlForCompaniesFindAllFiltered", function () {
+  test("works for all filters", function () {
+    const { whereConds, values } = sqlForCompaniesFindAllFiltered(
+      { nameLike: "test", minEmployees: 50, maxEmployees: 500 });
+    expect(whereConds).toEqual(
+      `name ILIKE $1 AND num_employees > $2 AND num_employees < $3`);
+    expect(values).toEqual(["test", 50, 500]);
+  });
+
+  test("works for single filters", function () {
+    const { whereConds, values } = sqlForCompaniesFindAllFiltered(
+      { nameLike: "test" });
+    expect(whereConds).toEqual(
+      `name ILIKE $1`);
+    expect(values).toEqual(["test"]);
+  });
+
+  test("fails min > max", function () {
+    try {
+      sqlForCompaniesFindAllFiltered(
+        { minEmployees: 500, maxEmployees: 50 });
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
 });

@@ -51,6 +51,11 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
+
+  //TODO: if req.query params:
+  //  validate the params
+  //    get companies from Company.findAllFiltered()
+  //    or throw error if bad params
   const companies = await Company.findAll();
   return res.json({ companies });
 });

@@ -66,13 +66,14 @@ class Company {
     return companiesRes.rows;
   }
   /** Find all companies, after filter via query params.
-   * 
-   *  Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
+   *  Given { param: filteredValue, ... } =>
+   *  Returns matching companies as:
+   *  [{ handle, name, description, numEmployees, logoUrl }, ...]
    */
   //TODO: Add findAllFiltered()
-  static async findAllFiltered() {
-    const companiesRes = await
-  }
+  // static async findAllFiltered(filters) {
+  //   const companiesRes = await
+  // }
 
   /** Given a company handle, return data about company.
    *

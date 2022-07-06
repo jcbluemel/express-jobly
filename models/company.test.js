@@ -210,8 +210,13 @@ describe("remove", function () {
 /****************************************** findAllFiltered */
 
 describe("findAllFiltered", function () {
-  test("works: no filter", async function () {
-    let companies = await Company.findAll();
+  test("works: all filters", async function () {
+    const filtered = {
+      nameLike: "C",
+      minEmployees: 1,
+      maxEmployees: 2
+    }
+    let companies = await Company.findAllFiltered(filtered);
     expect(companies).toEqual([
       {
         handle: "c1",
@@ -227,6 +232,21 @@ describe("findAllFiltered", function () {
         numEmployees: 2,
         logoUrl: "http://c2.img",
       },
+    ]);
+  });
+  test("works: single filter", async function () {
+    const filtered = {
+      minEmployees: 2
+    }
+    let companies = await Company.findAllFiltered(filtered);
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "C2",
+        description: "Desc2",
+        numEmployees: 2,
+        logoUrl: "http://c2.img",
+      },
       {
         handle: "c3",
         name: "C3",
@@ -235,5 +255,17 @@ describe("findAllFiltered", function () {
         logoUrl: "http://c3.img",
       },
     ]);
+  });
+  test("doesn't work, min > max", async function () {
+    const filtered = {
+      minEmployees: 3,
+      maxEmployees: 2,
+    }
+    try {
+      await Company.findAllFiltered(filtered);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
   });
 });

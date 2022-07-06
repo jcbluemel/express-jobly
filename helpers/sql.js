@@ -1,6 +1,16 @@
 const { BadRequestError } = require("../expressError");
 
-// THIS NEEDS SOME GREAT DOCUMENTATION.
+/** Takes JSON data and prepares it for SQL queries
+ * 
+ * If no data given, return 400 Error
+ * 
+ * Given {"firstName": "Aliya", "age": 32} =>
+ * 
+ * Returns {
+ *    setCols: '"first_name"=$1, "age"=$2',
+ *    values: ["Aliya", 32]
+ *  }
+*/
 
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);

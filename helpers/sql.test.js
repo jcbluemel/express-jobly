@@ -24,7 +24,9 @@ describe("sqlForPartialUpdate", function () {
     }
   });
 
-  //TODO: Test for potential error we would need to add to sql.js
+
+  //TODO: Test if requisite key conversion in jsToSql
+  //Test for potential error we would need to add to sql.js
   // test("no jsToSql failure", function () {
   //   try {
   //     sqlForPartialUpdate(

@@ -61,7 +61,10 @@ router.get("/", async function (req, res, next) {
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
+    const filters = req.params
   }
+
+
   //TODO: if req.query params:
   //  validate the params
   //    get companies from Company.findAllFiltered()

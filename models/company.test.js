@@ -256,16 +256,4 @@ describe("findAllFiltered", function () {
       },
     ]);
   });
-  test("doesn't work, min > max", async function () {
-    const filtered = {
-      minEmployees: 3,
-      maxEmployees: 2,
-    }
-    try {
-      await Company.findAllFiltered(filtered);
-      fail();
-    } catch (err) {
-      expect(err instanceof BadRequestError).toBeTruthy();
-    }
-  });
 });

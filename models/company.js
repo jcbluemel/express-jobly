@@ -2,7 +2,9 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { 
+  sqlForPartialUpdate,
+  sqlForCompaniesFindAllFiltered } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -65,32 +67,31 @@ class Company {
            ORDER BY name`);
     return companiesRes.rows;
   }
+
   /** Find all companies, after filter via query params.
    *  Given { param: filterValue, ... } =>
    *  Returns matching companies as:
    *  [{ handle, name, description, numEmployees, logoUrl }, ...]
    */
   //TODO:
-  static async findAllFiltered(filters) {
-    // nameLike, minEmployees, maxEmployees
-    // "net", 50, 500
+  static async findAllFiltered(data) {
+    const { whereConds, values } = 
+        sqlForCompaniesFindAllFiltered(data);
 
-    // an obj to store these: {"name ILIKE $1": variable, ...}
-
-    // .join("AND ")
-
-    `SELECT handle,
+    const querySql = `
+      SELECT handle,
             name,
             description,
             num_employees AS "numEmployees",
             logo_url AS "logoUrl"
       FROM companies
-      WHERE name ILIKE $1
-        AND num_employees > $2
-        AND num_employees < $3
-      ORDER BY name`,
-      [`%${nameLike}%`, minEmployees, maxEmployees];
+      WHERE ${ whereConds }
+      ORDER BY name`;
+
+    const result = await db.query(querySql, values);
+    return result.rows;
   }
+
   /** Given a company handle, return data about company.
    *
    * Returns { handle, name, description, numEmployees, logoUrl, jobs }

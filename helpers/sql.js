@@ -59,28 +59,28 @@ function sqlForCompaniesFindAllFiltered(filters) {
     throw new BadRequestError("Minimum employees cannot be larger than maximum");
   }
 
-  const condsFilters = [];
+  const whereConds = [];
   const condsValues = [];
   let count = 1;
 
   if (nameLike) {
-    condsFilters.push(`name ILIKE $${count}`);
-    condsValues.push(nameLike);
+    whereConds.push(`name ILIKE $${count}`);
+    condsValues.push(`%${nameLike}%`);
     count += 1;
   }
   if (minEmployees) {
-    condsFilters.push(`num_employees > $${count}`);
+    whereConds.push(`num_employees >= $${count}`);
     condsValues.push(minEmployees);
     count += 1;
   }
   if (maxEmployees) {
-    condsFilters.push(`num_employees < $${count}`);
+    whereConds.push(`num_employees <= $${count}`);
     condsValues.push(maxEmployees);
     count += 1;
   }
 
   return {
-    whereConds: condsFilters.join(" AND "),
+    whereConds: whereConds.join(" AND "),
     values: condsValues,
   };
 }

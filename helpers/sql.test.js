@@ -46,16 +46,32 @@ describe("sqlForCompaniesFindAllFiltered", function () {
     const { whereConds, values } = sqlForCompaniesFindAllFiltered(
       { nameLike: "test", minEmployees: 50, maxEmployees: 500 });
     expect(whereConds).toEqual(
-      `name ILIKE $1 AND num_employees > $2 AND num_employees < $3`);
-    expect(values).toEqual(["test", 50, 500]);
+      `name ILIKE $1 AND num_employees >= $2 AND num_employees <= $3`);
+    expect(values).toEqual(["%test%", 50, 500]);
   });
 
-  test("works for single filters", function () {
+  test("works for nameLike only", function () {
     const { whereConds, values } = sqlForCompaniesFindAllFiltered(
       { nameLike: "test" });
     expect(whereConds).toEqual(
       `name ILIKE $1`);
-    expect(values).toEqual(["test"]);
+    expect(values).toEqual(["%test%"]);
+  });
+
+  test("works for minEmployees only", function () {
+    const { whereConds, values } = sqlForCompaniesFindAllFiltered(
+      { minEmployees: 50 });
+    expect(whereConds).toEqual(
+      `num_employees >= $1`);
+    expect(values).toEqual([50]);
+  });
+
+  test("works for maxEmployees only", function () {
+    const { whereConds, values } = sqlForCompaniesFindAllFiltered(
+      { maxEmployees: 500 });
+    expect(whereConds).toEqual(
+      `num_employees <= $1`);
+    expect(values).toEqual([500]);
   });
 
   test("fails min > max", function () {
@@ -67,4 +83,6 @@ describe("sqlForCompaniesFindAllFiltered", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
+
+
 });

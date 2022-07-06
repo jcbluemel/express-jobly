@@ -1,3 +1,5 @@
+"use strict";
+
 const { BadRequestError } = require("../expressError");
 
 /** Takes JSON data and prepares it for SQL queries

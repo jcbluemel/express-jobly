@@ -6,7 +6,6 @@ const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
 
-
 /** Middleware: Authenticate user.
  *
  * If a token was provided, verify it, and, if valid, store the token payload
@@ -22,7 +21,6 @@ function authenticateJWT(req, res, next) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
     }
-    console.log("AKJWHKDJAHWKJHAWKJHKJHAWD", res.locals.user);
     return next();
   } catch (err) {
     return next();
@@ -47,32 +45,40 @@ function ensureLoggedIn(req, res, next) {
  *
  * If not, raises Unauthorized.
  */
-
- function ensureAdmin(req, res, next) {
+//TODO: fix for if not logged in a?.b.c optional chaining op
+function ensureAdmin(req, res, next) {
   try {
-    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    if (!res.locals.user?.isAdmin) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);
   }
 }
+
+/** Middleware to use when they must be either an admin or 
+ * route is about current user.
+ *
+ * If not, raises Unauthorized.
+ */
 
 function ensureAdminOrCurrentUser(req, res, next) {
-  console.log("ensureAdminOrCurr++++++++++++++++")
-  console.log('username', res.locals.user.username)
-  console.log('curUser', req.params.username)
   try {
-    if (res.locals.user.username !== req.params.username || !res.locals.user.isAdmin) throw new UnauthorizedError("THIS SUCKS");
-    return next();
+    if (
+      res.locals.user.username === req.params.username ||
+      res.locals.user.isAdmin
+    ) {
+      return next();
+    } else {
+      throw new UnauthorizedError();
+    }
   } catch (err) {
     return next(err);
   }
 }
-
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin,
-  ensureAdminOrCurrentUser
+  ensureAdminOrCurrentUser,
 };

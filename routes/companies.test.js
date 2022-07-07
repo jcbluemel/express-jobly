@@ -66,7 +66,7 @@ describe("POST /companies", function () {
 /************************************** GET /companies */
 
 describe("GET /companies", function () {
-  test("ok for anon", async function () {
+  test("ok with no filters", async function () {
     const resp = await request(app).get("/companies");
     expect(resp.body).toEqual({
       companies:
@@ -94,6 +94,25 @@ describe("GET /companies", function () {
             },
           ],
     });
+  });
+  test("ok with filter", async function () {
+    const resp = await request(app).get(`/companies?nameLike=1`);
+    expect(resp.body).toEqual({
+      companies:
+          [
+            {
+              handle: "c1",
+              name: "C1",
+              description: "Desc1",
+              numEmployees: 1,
+              logoUrl: "http://c1.img",
+            }
+          ],
+    });
+  });
+  test("fails schema validation", async function () {
+    const resp = await request(app).get(`/companies?foobar=1`);
+    expect(resp.statusCode).toEqual(400);
   });
 
   test("fails: test next() handler", async function () {

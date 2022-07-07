@@ -10,6 +10,7 @@ const { ensureLoggedIn } = require("../middleware/auth");
 const Company = require("../models/company");
 
 const companyNewSchema = require("../schemas/companyNew.json");
+const companyFilterSchema = require("../schemas/companyFilter.json");
 const companyUpdateSchema = require("../schemas/companyUpdate.json");
 
 const router = new express.Router();
@@ -28,7 +29,7 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyNewSchema,
-    {required: true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);
@@ -51,25 +52,29 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  if(req.query){
-    const validator = jsonschema.validate(
-      req.query,
-      companyFilter,
-      {required: true}
-    );
-    if (!validator.valid) {
-      const errs = validator.errors.map(e => e.stack);
-      throw new BadRequestError(errs);
-    }
-    const filters = req.params
+
+  // if no filters
+  if (Object.keys(req.query).length === 0) {
+
+    const companies = await Company.findAll();
+    return res.json({ companies });
   }
 
+  // if query filters included
+  const validator = jsonschema.validate(
+    req.query,
+    companyFilterSchema,
+    { required: true }
+  );
 
-  //TODO: if req.query params:
-  //  validate the params
-  //    get companies from Company.findAllFiltered()
-  //    or throw error if bad params
-  const companies = await Company.findAll();
+  if (!validator.valid) {
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
+  }
+
+  const filters = req.query;
+  const companies = await Company.findAllFiltered(filters);
+
   return res.json({ companies });
 });
 
@@ -101,7 +106,7 @@ router.patch("/:handle", ensureLoggedIn, async function (req, res, next) {
   const validator = jsonschema.validate(
     req.body,
     companyUpdateSchema,
-    {required:true}
+    { required: true }
   );
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);

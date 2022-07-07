@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { 
+const {
   sqlForPartialUpdate,
   sqlForCompaniesFindAllFiltered } = require("../helpers/sql");
 
@@ -57,6 +57,8 @@ class Company {
    * */
 
   static async findAll() {
+    console.log("findAll");
+
     const companiesRes = await db.query(
       `SELECT handle,
                 name,
@@ -75,7 +77,8 @@ class Company {
    */
   //TODO:
   static async findAllFiltered(data) {
-    const { whereConds, values } = 
+    console.log("findAllFiltered", data);
+    const { whereConds, values } =
         sqlForCompaniesFindAllFiltered(data);
 
     const querySql = `
@@ -87,8 +90,9 @@ class Company {
       FROM companies
       WHERE ${ whereConds }
       ORDER BY name`;
-
+    // console.log("query", querySql);
     const result = await db.query(querySql, values);
+    // console.log(result, "result");
     return result.rows;
   }
 

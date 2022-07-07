@@ -2,7 +2,7 @@
 
 const { BadRequestError } = require("../expressError");
 
-/** Takes JSON data and prepares it for SQL queries
+/** Takes data and prepares it for SQL queries
  *
  * If no data given, return 400 Error
  *
@@ -36,53 +36,4 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 
-/** Take JSON data and prepare it for company filtering query.
- *
- *  If minEmployees > maxEmployees, return 400 Error.
- *
- *  Given { nameLike: "net", minEmployees: 50, maxEmployees: 500 } =>
- *
- *  Return {
- *    whereConds: `name ILIKE $1
-        AND num_employees > $2
-        AND num_employees < $3`,
-      values: ["net", 50, 500]
- *   }
- */
-
-function sqlForCompaniesFindAllFiltered(filters) {
-  console.log("sqlForCompaniesFindAllFiltered", filters);
-
-  const { nameLike, minEmployees, maxEmployees } = filters;
-
-  if (minEmployees > maxEmployees) {
-    throw new BadRequestError("Minimum employees cannot be larger than maximum");
-  }
-
-  const whereConds = [];
-  const condsValues = [];
-  let count = 1;
-
-  if (nameLike) {
-    whereConds.push(`name ILIKE $${count}`);
-    condsValues.push(`%${nameLike}%`);
-    count += 1;
-  }
-  if (minEmployees) {
-    whereConds.push(`num_employees >= $${count}`);
-    condsValues.push(minEmployees);
-    count += 1;
-  }
-  if (maxEmployees) {
-    whereConds.push(`num_employees <= $${count}`);
-    condsValues.push(maxEmployees);
-    count += 1;
-  }
-
-  return {
-    whereConds: whereConds.join(" AND "),
-    values: condsValues,
-  };
-}
-
-module.exports = { sqlForPartialUpdate, sqlForCompaniesFindAllFiltered };
+module.exports = { sqlForPartialUpdate };

@@ -2,9 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const {
-  sqlForPartialUpdate,
-  sqlForCompaniesFindAllFiltered } = require("../helpers/sql");
+const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -70,16 +68,15 @@ class Company {
     return companiesRes.rows;
   }
 
-  /** Find all companies, after filter via query params.
+  /** Find all companies, filtering via query params.
    *  Given { param: filterValue, ... } =>
    *  Returns matching companies as:
    *  [{ handle, name, description, numEmployees, logoUrl }, ...]
    */
-  //TODO:
   static async findAllFiltered(data) {
-    console.log("findAllFiltered", data);
+    console.log("findAllFiltered");
     const { whereConds, values } =
-        sqlForCompaniesFindAllFiltered(data);
+        this._sqlForCompaniesFindAllFiltered(data);
 
     const querySql = `
       SELECT handle,
@@ -90,10 +87,57 @@ class Company {
       FROM companies
       WHERE ${ whereConds }
       ORDER BY name`;
-    // console.log("query", querySql);
     const result = await db.query(querySql, values);
-    // console.log(result, "result");
     return result.rows;
+  }
+
+
+  /** Take JSON data and prepare it for company filtering query.
+ *
+ *  If minEmployees > maxEmployees, return 400 Error.
+ *
+ *  Given { nameLike: "net", minEmployees: 50, maxEmployees: 500 } =>
+ *
+ *  Return {
+ *    whereConds: `name ILIKE $1
+        AND num_employees > $2
+        AND num_employees < $3`,
+      values: ["net", 50, 500]
+ *   }
+ */
+  static _sqlForCompaniesFindAllFiltered(filters) {
+    console.log("sqlForCompaniesFindAllFiltered", filters);
+  
+    const { nameLike, minEmployees, maxEmployees } = filters;
+  
+    if (minEmployees > maxEmployees) {
+      throw new BadRequestError("Minimum employees cannot be larger than maximum");
+    }
+  
+    const whereConds = [];
+    const condsValues = [];
+    let count = 1;
+  
+    if (nameLike) {
+      whereConds.push(`name ILIKE $${count}`);
+      condsValues.push(`%${nameLike}%`);
+      count += 1;
+    }
+    if (minEmployees) {
+      whereConds.push(`num_employees >= $${count}`);
+      condsValues.push(minEmployees);
+      count += 1;
+    }
+    if (maxEmployees) {
+      whereConds.push(`num_employees <= $${count}`);
+      condsValues.push(maxEmployees);
+      count += 1;
+    }
+  
+    return {
+      whereConds: whereConds.join(" AND "),
+      values: condsValues,
+    };
   }
 
   /** Given a company handle, return data about company.

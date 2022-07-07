@@ -107,8 +107,10 @@ describe("ensureAdmin", function () {
 describe("ensureAdminOrCurrentUser", function () {
   test("works for current user", function () {
     expect.assertions(1);
-    const req = { headers: { authorization: `Bearer ${testJwt}` },
-                  params: { username: "test" } };
+    const req = {
+      headers: { authorization: `Bearer ${testJwt}` },
+      params: { username: "test" }
+    };
     const res = { locals: { user: { username: "test", isAdmin: false } } };
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -118,8 +120,10 @@ describe("ensureAdminOrCurrentUser", function () {
 
   test("works for admin", function () {
     expect.assertions(1);
-    const req = { headers: { authorization: `Bearer ${admJwt}` },
-                  params: { username: "test" } };
+    const req = {
+      headers: { authorization: `Bearer ${admJwt}` },
+      params: { username: "test" }
+    };
     const res = { locals: { user: { username: "testAdm", isAdmin: true } } };
     const next = function (err) {
       expect(err).toBeFalsy();
@@ -129,8 +133,10 @@ describe("ensureAdminOrCurrentUser", function () {
 
   test("unauth if user is not current user or admin", function () {
     expect.assertions(1);
-    const req = { headers: { authorization: `Bearer ${test2Jwt}` },
-                  params: { username: "test" } };
+    const req = {
+      headers: { authorization: `Bearer ${test2Jwt}` },
+      params: { username: "test" }
+    };
     const res = { locals: { user: { username: "test2", isAdmin: false } } };
     const next = function (err) {
       expect(err instanceof UnauthorizedError).toBeTruthy();

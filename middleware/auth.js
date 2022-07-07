@@ -45,7 +45,7 @@ function ensureLoggedIn(req, res, next) {
  *
  * If not, raises Unauthorized.
  */
-//TODO: fix for if not logged in a?.b.c optional chaining op
+
 function ensureAdmin(req, res, next) {
   try {
     if (!res.locals.user?.isAdmin) throw new UnauthorizedError();
@@ -55,7 +55,7 @@ function ensureAdmin(req, res, next) {
   }
 }
 
-/** Middleware to use when they must be either an admin or 
+/** Middleware to use when they must be either an admin or
  * route is about current user.
  *
  * If not, raises Unauthorized.
@@ -63,9 +63,10 @@ function ensureAdmin(req, res, next) {
 
 function ensureAdminOrCurrentUser(req, res, next) {
   try {
+    if (!res.locals.user?.username) throw new UnauthorizedError();
     if (
-      res.locals.user.username === req.params.username ||
-      res.locals.user.isAdmin
+      res.locals.user?.username === req.params?.username ||
+      res.locals.user?.isAdmin
     ) {
       return next();
     } else {

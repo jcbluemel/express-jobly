@@ -45,5 +45,44 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
   return res.status(201).json({ job });
 });
 
+/** GET /  =>
+ *   { jobs: [ { title, salary, equity, company_handle }, ...] }
+ *
+ * TODO: filter to be added
+ * Can filter on provided search filters:
+ * - title(will find case-insensitive, partial matches)
+ * - minSalar
+ * - hasEquity 
+ *
+ * Authorization required: none
+ */
+
+ router.get("/", async function (req, res, next) {
+
+  // if no filters
+  if (Object.keys(req.query).length === 0) {
+
+    const jobs = await Job.findAll();
+    return res.json({ jobs });
+
+  }
+
+  // if query filters included
+  // const validator = jsonschema.validate(
+  //   req.query,
+  //   jobNewSchema,
+  //   { required: true }
+  // );
+
+  // if (!validator.valid) {
+  //   const errs = validator.errors.map(e => e.stack);
+  //   throw new BadRequestError(errs);
+  // }
+
+  // const filters = req.query;
+  // const jobs = await Job.findAllFiltered(filters);
+  
+  return res.json({ jobs });
+});
 
 module.exports = router;

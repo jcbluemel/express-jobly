@@ -100,3 +100,36 @@ describe("POST /jobs", function () {
     expect(resp.statusCode).toEqual(400);
   });
 });
+
+/************************************** GET /jobs */
+
+describe("GET /jobs", function () {
+  test("ok with no filters", async function () {
+    const resp = await request(app).get("/jobs");
+    expect(resp.body).toEqual({
+      jobs: [
+      {
+        title: "j1",
+        salary: 10000,
+        equity: "0.01",
+        company_handle: "c1",
+        id: expect.any(Number)
+      },
+      {
+        title: "j2",
+        salary: 20000,
+        equity: null,
+        company_handle: "c1",
+        id: expect.any(Number)
+      },
+      {
+        title: "j3",
+        salary: 30000,
+        equity: "0.03",
+        company_handle: "c2",
+        id: expect.any(Number)
+      },
+    ]});
+  });
+
+});

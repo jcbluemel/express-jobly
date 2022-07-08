@@ -13,17 +13,17 @@ class Job {
    * Returns { id, title, salary, equity, company_handle }
    * */
 
-   static async create({ title, salary, equity, company_handle }) {
+  static async create({ title, salary, equity, company_handle }) {
     const noCompany = await db.query(
       `SELECT handle
            FROM companies
            WHERE handle = $1`,
-      [company_handle]);
+      [company_handle]
+    );
 
     if (noCompany.rows.length === 0) {
       throw new BadRequestError(`Company doesn't exist: ${company_handle}`);
     }
-
 
     const result = await db.query(
       `INSERT INTO jobs(
@@ -34,16 +34,31 @@ class Job {
            VALUES
              ($1, $2, $3, $4)
            RETURNING id, title, salary, equity, company_handle`,
-      [
-        title,
-        salary,
-        equity,
-        company_handle,
-      ],
+      [title, salary, equity, company_handle]
     );
     const job = result.rows[0];
 
     return job;
+  }
+
+  /** Find all jobs.
+   *
+   * Returns [{ id, title, salary, equity, company_handle }, ...]
+   * */
+
+  static async findAll() {
+    console.log("findAll");
+
+    const jobRes = await db.query(
+      `SELECT id,
+              title,
+              salary,
+              equity,
+              company_handle
+            FROM jobs
+            ORDER BY title`
+    );
+    return jobRes.rows;
   }
 }
 

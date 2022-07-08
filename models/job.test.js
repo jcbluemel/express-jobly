@@ -65,3 +65,34 @@ describe("create", function () {
     }
   });
 });
+
+/************************************** findAll */
+
+describe("findAll", function () {
+  test("works: no filter", async function () {
+    let jobs = await Job.findAll();
+    expect(jobs).toEqual([
+      {
+        title: "j1",
+        salary: 10000,
+        equity: "0.01",
+        company_handle: "c1",
+        id: expect.any(Number)
+      },
+      {
+        title: "j2",
+        salary: 20000,
+        equity: null,
+        company_handle: "c1",
+        id: expect.any(Number)
+      },
+      {
+        title: "j3",
+        salary: 30000,
+        equity: "0.03",
+        company_handle: "c2",
+        id: expect.any(Number)
+      },
+    ]);
+  });
+});

@@ -20,8 +20,10 @@ class Job {
            WHERE handle = $1`,
       [company_handle]);
 
-    if (noCompany.rows.length === 0)
+    if (noCompany.rows.length === 0) {
       throw new BadRequestError(`Company doesn't exist: ${company_handle}`);
+    }
+
 
     const result = await db.query(
       `INSERT INTO jobs(

@@ -26,7 +26,7 @@ describe("POST /jobs", function () {
     title: "new job",
     salary: 50000,
     equity: "0.01",
-    company_handle: "new"
+    company_handle: "c1"
   };
 
   test("unauth for anon", async function () {
@@ -51,7 +51,10 @@ describe("POST /jobs", function () {
         .set("authorization", `Bearer ${u4TokenAdmin}`);
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
-      job: newJob,
+      job: {
+        ...newJob,
+        id: expect.any(Number)
+      },
     });
   });
 
@@ -60,22 +63,23 @@ describe("POST /jobs", function () {
         .post("/jobs")
         .send({
           title: "new job",
-          company_handle: "new"
+          company_handle: "c1"
         })
         .set("authorization", `Bearer ${u4TokenAdmin}`);
     expect(resp.statusCode).toEqual(201);
     expect(resp.body).toEqual({
       job: {
         title: "new job",
-        salary: NULL,
-        equity: NULL,
-        company_handle: "new"
+        salary: null,
+        equity: null,
+        company_handle: "c1",
+        id: expect.any(Number)
       }});
   });
 
   test("bad request with missing required data as admin", async function () {
     const resp = await request(app)
-        .post("/companies")
+        .post("/jobs")
         .send({
           title: "new job",
           salary: 50000,
@@ -83,15 +87,16 @@ describe("POST /jobs", function () {
         .set("authorization", `Bearer ${u4TokenAdmin}`);
     expect(resp.statusCode).toEqual(400);
   });
-  //TODO:
-  // test("bad request with invalid data as admin", async function () {
-  //   const resp = await request(app)
-  //       .post("/companies")
-  //       .send({
-  //         ...newJob,
-  //         logoUrl: "not-a-url",
-  //       })
-  //       .set("authorization", `Bearer ${u4TokenAdmin}`);
-  //   expect(resp.statusCode).toEqual(400);
-  // });
+
+  test("bad request with invalid equity data as admin", async function () {
+    const resp = await request(app)
+        .post("/jobs")
+        .send({
+          title: "new job",
+          equity: "moose",
+          company_handle: "c1"
+        })
+        .set("authorization", `Bearer ${u4TokenAdmin}`);
+    expect(resp.statusCode).toEqual(400);
+  });
 });

@@ -143,4 +143,17 @@ describe("ensureAdminOrCurrentUser", function () {
     };
     ensureAdminOrCurrentUser(req, res, next);
   });
+
+  test("unauth if no user", function () {
+    expect.assertions(1);
+    const req = {
+      headers: { authorization: `Bearer ${test2Jwt}` },
+      params: { username: "test" }
+    };
+    const res = { locals: {} };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureAdminOrCurrentUser(req, res, next);
+  });
 });

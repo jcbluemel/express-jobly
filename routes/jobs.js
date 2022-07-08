@@ -52,21 +52,21 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
  * Can filter on provided search filters:
  * - title(will find case-insensitive, partial matches)
  * - minSalar
- * - hasEquity 
+ * - hasEquity
  *
  * Authorization required: none
  */
 
  router.get("/", async function (req, res, next) {
 
-  // if no filters
-  if (Object.keys(req.query).length === 0) {
+  // // if no filters
+  // if (Object.keys(req.query).length === 0) {
 
-    const jobs = await Job.findAll();
-    return res.json({ jobs });
 
-  }
 
+  // }
+  const jobs = await Job.findAll();
+  return res.json({ jobs });
   // if query filters included
   // const validator = jsonschema.validate(
   //   req.query,
@@ -81,8 +81,8 @@ router.post("/", ensureLoggedIn, ensureAdmin, async function (req, res, next) {
 
   // const filters = req.query;
   // const jobs = await Job.findAllFiltered(filters);
-  
-  return res.json({ jobs });
+
+  // return res.json({ jobs });
 });
 
 module.exports = router;
